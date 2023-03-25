@@ -57,13 +57,20 @@ Now let's add a `_init_.py` file. Taking the example of FusionAuth, the _init_.p
 
 ```
 from testcontainers.core.container import DockerContainer
+
 class FusionAuthContainer(DockerContainer):
     def __init__(self, version="latest"):
         super(FusionAuthContainer, self).__init__(
-            "fusionauth/fusionauth-app",
+            "fusionauth/fusionauth-app:latest",
             version=version,
         )
+
+    def is_healthy(self):
+        response = self.exec(["curl", "http://localhost:9011/.well-known/jwks.json"])
+        print(response)
+
 __all__ = ["FusionAuthContainer"]
+
 ```
 
 Now, let's understand what the above code does. 
