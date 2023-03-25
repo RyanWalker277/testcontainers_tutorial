@@ -67,7 +67,7 @@ class FusionAuthContainer(DockerContainer):
 
     def is_healthy(self):
         response = self.exec(["curl", "http://localhost:9011/.well-known/jwks.json"])
-        print(response)
+        return response.exit_code == 0
 
 __all__ = ["FusionAuthContainer"]
 
