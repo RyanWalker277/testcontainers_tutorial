@@ -105,3 +105,65 @@ setup(
 Now, we just need to add a line `-e file:[service name]` to `requirements.in` and run `make requirements`. This command will find any new requirements and generate lock files to ensure reproducible builds. Then run `pip install -r requirements/[your python version].txt` to install the new requirements.
 
 In this way, you can add your own containers to `testcontainers-python`. Keep in mind the above implementation was limited in it's scope. The custom container class defined by you can have much more attributes depending on the container added.
+
+## How to define hooks for container life cycle management?
+
+The container can use predefined `DockerContainer` or `DockerCompose` class methods for managing the the life cycle. Ther are a lot of pre-defined methods there which can be used to create hooks based on the use case of the specefic container. Here is a small description of each of them: 
+
+DockerContainer:
+
+- `with_env()`: Sets environment variables for the Docker container.
+- `with_bind_ports()`: Binds container ports to host ports.
+- `with_exposed_ports()`: Exposes container ports to the network.
+- `with_kwargs()`: Sets additional keyword arguments for the Docker container.
+- `maybe_emulate_amd64()`: Sets platform to "linux/amd64" if running on ARM architecture.
+- `start()`: Starts the Docker container.
+- `stop()`: Stops the Docker container.
+- `enter()`: Starts the Docker container when used as a context manager.
+- `exit()`: Stops the Docker container when used as a context manager.
+- `del()`: Tries to remove the Docker container in all circumstances.
+- `get_container_host_ip()`: Returns the host IP address of the Docker container.
+- `get_exposed_port()`: Returns the exposed port for a specified container port.
+- `with_command()`: Sets the command to be run in the Docker container.
+- `with_name()`: Sets the name of the Docker container.
+- `with_volume_mapping()`: Sets a host and container directory mapping for the Docker container.
+- `get_wrapped_container()`: Returns the wrapped Docker container object.
+- `get_docker_client()`: Returns the Docker client.
+- `get_logs()`: Returns the logs of the Docker container.
+- `exec()`: Executes a command in the Docker container.
+
+DockerCompose:
+
+- `docker_compose_command`: Returns a list of command parts for running docker-compose commands.
+- `start`: Starts the docker-compose environment, with the option to pull and/or build images.
+- `stop`: Stops the docker-compose environment and removes associated volumes.
+- `get_logs`: Returns all log output from stdout and stderr.
+- `exec_in_container`: Executes a command in the container of one of the services.
+- `get_service_port`: Returns the mapped port for one of the services.
+- `get_service_host`: Returns the hostname for one of the services.
+- `_get_service_info`: Returns a list with the hostname and mapped port for one of the services.
+- `_call_command`: Calls a given command with the option to specify a working directory.
+- `wait_for`: Waits for a response from a given URL, typically used to block until a service is ready.
+
+## So, why are they called "test" containers?
+
+Since they are largely employed in software testing, test containers are referred to as "Test" containers. They offer a simple method for conducting tests in a setting that closely resembles a production environment. Test containers are perfect for running tests repeatedly and fast, which is a crucial requirement in software testing. They are lightweight and can be spun up and broken down quickly. Developers may make sure their code operates in a consistent and reproducible environment by using test containers, which helps to find flaws and failures before they are published to production.
+
+## Are there any limitations?
+
+Test-container tests can be slow because they require starting and stopping Docker containers, which can take several seconds or even minutes depending on the complexity of the container and the resources available on the testing machine. Additionally, if multiple containers need to be started and configured for a single test case, the time required for setup and teardown can be significant. This can result in longer feedback loops, which can slow down the overall development and testing process. However, the benefits of using test-containers, such as increased test reliability and ease of use, often outweigh the added time required for testing.
+
+## Can the speed limitations be conquered?
+
+Fortunately, there are a few ways to speed up the tests.
+
+- Use the Singleton Pattern
+- Speed-Up Start Time with Multiple Containers:
+- Reuse the testcontainers
+- Running the tests in a Docker Container (Docker in Docker)
+
+[Refrence](https://callistaenterprise.se/blogg/teknik/2020/10/09/speed-up-your-testcontainers-tests/)
+
+## Why does it only support only a limited number of containers?
+
+The reason behind the limited support of containers by the testcontainers library is attributed to the relatively small size of its contributor-base. However, the library offers the advantage of being highly adaptable to modifications, enabling it to effectively cater to specific container requirements. Despite the limited number of supported containers, the library maintains its flexibility and versatility, which can prove to be advantageous in certain situations. Additionally, the testcontainers library is continuously evolving, and with the growth of its contributor-base, it is expected to expand its support for a wider range of containers in the future.
